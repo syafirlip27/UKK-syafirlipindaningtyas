@@ -29,19 +29,20 @@
                                                 $total = [];
                                             @endphp
                                             @foreach ($shop as $item)
-                                                <input type="hidden" name="shop[]" value="{{ $item }}" hidden>
-                                                <tr>
-                                                    <td>{{ explode(';', $item)[1] }} <br> <small>Rp.
-                                                            {{ number_format(explode(';', $item)[2], '0', ',', '.') }} X
-                                                            {{ explode(';', $item)[3] }}</small></td>
-                                                    <td><b>Rp.
-                                                            {{ number_format(explode(';', $item)[4], '0', ',', '.') }}</b>
-                                                    </td>
-                                                </tr>
                                                 @php
-                                                    array_push($total, explode(';', $item)[4]);
+                                                    $parts = explode(';', $item);
+                                                    $total[] = $parts[4];
                                                 @endphp
+                                                <input type="hidden" name="shop[]" value="{{ $item }}">
+                                                <tr>
+                                                    <td>{{ $parts[1] }} <br>
+                                                        <small>Rp. {{ number_format($parts[2], 0, ',', '.') }} x
+                                                            {{ $parts[3] }}</small>
+                                                    </td>
+                                                    <td><b>Rp. {{ number_format($parts[4], 0, ',', '.') }}</b></td>
+                                                </tr>
                                             @endforeach
+
                                             <tr>
                                                 <td style="padding-top: 20px; font-size: 20px;"><b>Total</b></td>
                                                 <td class="tex-end" style="padding-createsalestop: 20px; font-size: 20px;">
@@ -88,12 +89,13 @@
                                     <div class="row">
                                         <div class="form-group">
                                             <label for="total_pay" class="form-label">Total Bayar</label>
-                                            <input type="text" name="total_pay" id="total_pay" class="form-control" required 
-                                                   max="9999999999" 
-                                                   oninput="formatRupiah(this); checkTotalPay(); this.value = this.value.slice(0, 18);">
-                                            <small id="error-message" class="text-danger d-none">Jumlah bayar kurang.</small>
+                                            <input type="text" name="total_pay" id="total_pay" class="form-control"
+                                                required max="9999999999"
+                                                oninput="formatRupiah(this); checkTotalPay(); this.value = this.value.slice(0, 18);">
+                                            <small id="error-message" class="text-danger d-none">Jumlah bayar
+                                                kurang.</small>
                                         </div>
-                                    </div>                                    
+                                    </div>
                                     <div class="row text-end">
                                         <div class="col-md-12">
                                             <button class="btn btn-primary" id="submit-button" type="submit">Pesan</button>
@@ -127,45 +129,44 @@
             }
         }
     </script>
-<script>
-    function formatRupiah(input) {
-        // Menghapus karakter yang bukan angka
-        let value = input.value.replace(/[^0-9]/g, '');
+    <script>
+        function formatRupiah(input) {
+            // Menghapus karakter yang bukan angka
+            let value = input.value.replace(/[^0-9]/g, '');
 
-        // Jika input kosong, jangan tampilkan "Rp. "
-        if (value === "") {
-            input.value = "";
-            return;
+            // Jika input kosong, jangan tampilkan "Rp. "
+            if (value === "") {
+                input.value = "";
+                return;
+            }
+
+            // Memformat angka menjadi format Rupiah dengan titik setiap 3 digit
+            let formattedValue = 'Rp.' + value.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+
+            // Mengupdate nilai input
+            input.value = formattedValue;
         }
 
-        // Memformat angka menjadi format Rupiah dengan titik setiap 3 digit
-        let formattedValue = 'Rp.'+ value.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+        function checkTotalPay() {
+            const totalPayInput = document.getElementById('total_pay');
+            const totalInput = document.getElementById('total_price'); // Hidden input
+            const submitButton = document.getElementById('submit-button');
+            const errorMessage = document.getElementById('error-message');
 
-        // Mengupdate nilai input
-        input.value = formattedValue;
-    }
+            // Mengambil nilai numerik dari total_pay
+            const totalPayValue = parseInt(totalPayInput.value.replace(/[^0-9]/g, ''), 10) || 0;
 
-    function checkTotalPay() {
-        const totalPayInput = document.getElementById('total_pay');
-        const totalInput = document.getElementById('total_price'); // Hidden input
-        const submitButton = document.getElementById('submit-button');
-        const errorMessage = document.getElementById('error-message');
+            // Mengambil nilai total dari input hidden
+            const totalValue = parseInt(totalInput.value.replace(/[^0-9]/g, ''), 10) || 0;
 
-        // Mengambil nilai numerik dari total_pay
-        const totalPayValue = parseInt(totalPayInput.value.replace(/[^0-9]/g, ''), 10) || 0;
-
-        // Mengambil nilai total dari input hidden
-        const totalValue = parseInt(totalInput.value.replace(/[^0-9]/g, ''), 10) || 0;
-
-        // Memeriksa apakah totalPayValue kurang dari totalValue
-        if (totalPayValue < totalValue) {
-            submitButton.disabled = true; // Nonaktifkan tombol submit
-            errorMessage.classList.remove('d-none'); // Tampilkan pesan kesalahan
-        } else {
-            submitButton.disabled = false; // Aktifkan tombol submit
-            errorMessage.classList.add('d-none'); // Sembunyikan pesan kesalahan
+            // Memeriksa apakah totalPayValue kurang dari totalValue
+            if (totalPayValue < totalValue) {
+                submitButton.disabled = true; // Nonaktifkan tombol submit
+                errorMessage.classList.remove('d-none'); // Tampilkan pesan kesalahan
+            } else {
+                submitButton.disabled = false; // Aktifkan tombol submit
+                errorMessage.classList.add('d-none'); // Sembunyikan pesan kesalahan
+            }
         }
-    }
-</script>
-
+    </script>
 @endpush

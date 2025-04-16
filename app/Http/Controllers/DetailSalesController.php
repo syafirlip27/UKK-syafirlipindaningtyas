@@ -97,12 +97,40 @@ class DetailSalesController extends Controller
         }
     }
 
-    public function exportexcel()
-    {
-        if (Auth::user()->role == 'employee') {
-            return FacadesExcel::download(new SalesExport, 'Penjualan.xlsx');
+    public function exportExcel(Request $request)
+{
+    // Filter berdasarkan tanggal
+    $salesQuery = Sales::with('customer', 'user', 'detail_sales');
+
+    // Pastikan filter_type dan filter_value diterima dari request
+    if ($request->filter_type && $request->filter_value) {
+        $filterType = $request->filter_type;
+        $filterValue = $request->filter_value;
+
+        if ($filterType == 'daily') {
+            // Pastikan filterValue adalah tanggal yang benar
+            $salesQuery->whereDate('sale_date', Carbon::parse($filterValue));
+        } elseif ($filterType == 'monthly') {
+            // Pastikan filterValue adalah bulan dan tahun dalam format 'YYYY-MM'
+            $salesQuery->whereMonth('sale_date', Carbon::parse($filterValue)->month)
+                ->whereYear('sale_date', Carbon::parse($filterValue)->year);
+        } elseif ($filterType == 'yearly') {
+            // Pastikan filterValue adalah tahun dalam format 'YYYY'
+            $salesQuery->whereYear('sale_date', $filterValue);
         }
     }
+
+    // Ambil data penjualan sesuai filter
+    $sales = $salesQuery->get();
+
+    // Jika tidak ada data yang ditemukan
+    if ($sales->isEmpty()) {
+        return redirect()->back()->with('error', 'Tidak ada data untuk filter yang dipilih.');
+    }
+
+    // Mendownload Excel
+    return Excel::download(new SalesExport($sales), 'penjualan.xlsx');
+}
     /**
      * Show the form for creating a new resource.
      */

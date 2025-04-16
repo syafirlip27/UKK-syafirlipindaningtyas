@@ -11,12 +11,28 @@
                         <div class="col text-start">
                             <div class="row">
                                 @if (Auth::user()->role == 'employee')
-                                <div class="col-6">
-                                    <a href="{{ route('sales.exportexcel') }}" class="btn btn-info">
+                                <form action="{{ route('sales') }}" method="GET" class="d-flex align-items-center gap-2 mb-3">
+                                    <!-- Filter berdasarkan Tanggal -->
+                                    <select name="filter_type" class="form-select" required>
+                                        <option value="" selected disabled>Pilih Tipe Filter</option>
+                                        <option value="daily" {{ request('filter_type') == 'daily' ? 'selected' : '' }}>Harian</option>
+                                        <option value="monthly" {{ request('filter_type') == 'monthly' ? 'selected' : '' }}>Bulanan</option>
+                                        <option value="yearly" {{ request('filter_type') == 'yearly' ? 'selected' : '' }}>Tahunan</option>
+                                    </select>
+                                
+                                    <input type="date" name="filter_value" value="{{ request('filter_value') }}" class="form-control" required>
+                                
+                                    <button type="submit" class="btn btn-secondary">Filter</button>
+                                
+                                    <a
+                                        href="{{ route('sales.exportexcel', ['filter_type' => request('filter_type'), 'filter_value' => request('filter_value')]) }}"
+                                        class="btn btn-info"
+                                    >
                                         Export Penjualan (.xlsx)
                                     </a>
-                                </div>
+                                </form>
                                 @endif
+                                
                             </div>
                         </div>
                         @if (Auth::user()->role == 'employee')

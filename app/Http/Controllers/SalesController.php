@@ -15,19 +15,33 @@ class SalesController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
-    {
-        // $max_data = 10;
-        // $query = sales::with('customer', 'user', 'detail_sales')->orderBy('id','desc');
-     
-        // if (request('search')) {
-        //     $query->where('sale_date', 'like', '%' . request('search') . '%');
-        // }
-    
-        // $sales = $query->paginate($max_data)->withQueryString();
-        $sales = sales::with('customer', 'user', 'detail_sales')->orderBy('id','desc')->get();
-        return view('module.sale.index', compact('sales'));
+     public function index(Request $request)
+{
+    $salesQuery = Sales::with(['customer', 'user', 'detail_sales']);
+
+    if ($request->filter_type && $request->filter_value) {
+        $filterValue = $request->filter_value;
+        $date = \Carbon\Carbon::parse($filterValue);
+
+        switch ($request->filter_type) {
+            case 'daily':
+                $salesQuery->whereDate('sale_date', $date);
+                break;
+            case 'monthly':
+                $salesQuery->whereMonth('sale_date', $date->month)
+                           ->whereYear('sale_date', $date->year);
+                break;
+            case 'yearly':
+                $salesQuery->whereYear('sale_date', $date->year);
+                break;
+        }
     }
+
+    $sales = $salesQuery->get();
+
+    return view('module.sale.index', compact('sales'));
+}
+
     
 
 

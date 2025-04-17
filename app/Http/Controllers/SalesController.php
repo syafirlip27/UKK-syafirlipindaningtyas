@@ -42,6 +42,7 @@ class SalesController extends Controller
     return view('module.sale.index', compact('sales'));
 }
 
+
     
 
 

@@ -2,37 +2,38 @@
 
 namespace App\Exports;
 
-use App\Models\sales;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
+use Carbon\Carbon; // Tambahkan ini untuk parsing tanggal
 
 class SalesExport implements FromCollection, WithHeadings, WithMapping
 {
-    /**
-    * @return \Illuminate\Support\Collection
-    */
+    protected $sales;
+
+    public function __construct(Collection $sales)
+    {
+        $this->sales = $sales;
+    }
+
     public function collection()
     {
-        if (Auth::user()->role == 'employee') {
-            return sales::with('customer', 'user', 'detail_sales')->orderBy('id','desc')->get(); 
-        }else{
-            redirect()->back();
-        }
+        return $this->sales;
     }
+
     public function headings(): array
     {
         return [
-            'nama pembeli',
+            'Nama Pembeli',
             'No HP Pembeli',
-            'point Pembeli',
-            'product',
+            'Point Pembeli',
+            'Produk',
             'Total Harga',
-            'total bayar',
-            'total discount point',
-            'total kembalian',
-            'tanggal pembelian',
+            'Total Bayar',
+            'Total Discount Point',
+            'Total Kembalian',
+            'Tanggal Pembelian',
         ];
     }
 
@@ -44,15 +45,15 @@ class SalesExport implements FromCollection, WithHeadings, WithMapping
             optional($item->customer)->point ?? 0,
             $item->detail_sales->map(function ($detail) {
                 return optional($detail->product)->name
-                    ? optional($detail->product)->name . ' (' . $detail->amount . ' : Rp. ' . number_format( $detail->subtotal, 0, ',', '.') . ')'
+                    ? optional($detail->product)->name . ' (' . $detail->amount . ' x Rp. ' . number_format($detail->product->price, 0, ',', '.') . ' = Rp. ' . number_format($detail->subtotal, 0, ',', '.') . ')'
                     : 'Produk tidak tersedia';
-            })->implode(', '), 
-            $item->detail_sales->sum('subtotal'), 
-            $item->total_pay,
-            $item->total_price - optional($item->customer)->point ?? 0,
-            $item->total_return,
-            $item->created_at,
+            })->implode(', '),
+            'Rp. ' . number_format($item->total_price, 0, ',', '.'),
+            'Rp. ' . number_format($item->total_pay, 0, ',', '.'),
+            'Rp. ' . number_format(optional($item->customer)->point ?? 0, 0, ',', '.'),
+            'Rp. ' . number_format($item->total_return, 0, ',', '.'),
+            Carbon::parse($item->sale_date)->format('d-m-Y'),
         ];
     }
-    
 }
+

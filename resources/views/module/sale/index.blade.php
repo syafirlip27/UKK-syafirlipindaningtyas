@@ -25,11 +25,12 @@
                                     <button type="submit" class="btn btn-secondary">Filter</button>
                                 
                                     <a
-                                        href="{{ route('sales.exportexcel', ['filter_type' => request('filter_type'), 'filter_value' => request('filter_value')]) }}"
-                                        class="btn btn-info"
-                                    >
-                                        Export Penjualan (.xlsx)
-                                    </a>
+                                    href="{{ route('sales.exportexcel', ['filter_type' => request('filter_type'), 'filter_value' => request('filter_value')]) }}"
+                                    class="btn"
+                                    style="background-color: #1da1f2; color: black; font-weight: 500; border-radius: 8px; padding: 10px 20px;"
+                                >
+                                    Export Penjualan (.xlsx)
+                                </a>
                                 </form>
                                 @endif
                                 

@@ -2487,6 +2487,14 @@ textarea.form-control-lg {
   filter: none;
   opacity: 0.65;
 }
+.btn-custom-blue {
+  background-color: #1da1f2;
+  color: black;
+  font-weight: 500;
+  border-radius: 8px;
+  padding: 10px 20px;
+  border: none;
+}
 
 .form-range {
   width: 100%;

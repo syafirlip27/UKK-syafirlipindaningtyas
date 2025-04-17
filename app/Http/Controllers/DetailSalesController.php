@@ -13,7 +13,7 @@ use Barryvdh\DomPDF\Facade as PDF;
 use Barryvdh\DomPDF\Facade\Pdf as FacadePdf;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
-use Maatwebsite\Excel\Excel;
+use Maatwebsite\Excel\Facades\Excel;
 use Maatwebsite\Excel\Facades\Excel as FacadesExcel;
 
 class DetailSalesController extends Controller

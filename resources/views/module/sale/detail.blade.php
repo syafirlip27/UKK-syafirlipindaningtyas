@@ -43,6 +43,7 @@
                                                 </tr>
                                             @endforeach
 
+
                                             <tr>
                                                 <td style="padding-top: 20px; font-size: 20px;"><b>Total</b></td>
                                                 <td class="tex-end" style="padding-createsalestop: 20px; font-size: 20px;">
